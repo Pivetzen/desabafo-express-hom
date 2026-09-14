@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DESABAFO EXPRESS 🤬</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #e0e0e0;
+            --accent-color: #ff3e3e;
+            --success: #00ff88;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column; /* Empilha os elementos verticalmente */
+            align-items: center;
+            min-height: 100vh; /* Garante que o fundo cubra a tela toda */
+            margin: 0;
+            overflow-y: auto; /* Permite a rolagem se o conteúdo crescer */
+            padding: 1px 0; /* Dá um respiro no topo e no final */
+        }
+        .container {
+            background-color: var(--card-bg);
+            padding: 1rem; /* Reduzi de 2rem para 1rem */
+            border-radius: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.7);
+            width: 90%;
+            max-width: 400px; /* Reduzi um pouco a largura, 450 para 400 */
+            text-align: center;
+            border: 1px solid #333;
+            margin-top: 0px; /* Garante que comece colado no topo */
+        }
+
+        h1 { margin-bottom: 0 0 0.5rem 0; color: var(--accent-color); font-size: 1.3rem; }
+        p { color: #bbb; margin-bottom: 0.8rem;font-size: 0.9rem; }
+
+        textarea {
+            width: 100%;
+            padding: 8px;
+            border-radius: 10px;
+            border: 1px solid #444;
+            background: #2a2a2a;
+            color: white;
+            margin-bottom: 0.5rem;
+            resize: none;
+            box-sizing: border-box;
+            font-size: 1rem;
+        }
+
+        .termometro {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 6px;
+            margin-bottom: 0.8rem;
+        }
+
+        .btn-nivel {
+            padding: 12px 5px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 800;
+            text-transform: uppercase;
+            transition: all 0.2s ease;
+            color: #111;
+            font-size: 0.7rem;
+        }
+
+        .baixo { background-color: #4cd137; }
+        .medio { background-color: #fbc531; }
+        .alto { background-color: #e67e22; }
+        .aaaa { 
+            background-color: #c23616; 
+            color: white;
+            grid-column: span 3;
+            animation: shake 0.5s infinite;
+        }
+
+        @keyframes shake {
+            0% { transform: translate(1px, 1px) rotate(0deg); }
+            10px { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            100% { transform: translate(1px, 1px) rotate(0deg); }
+        }
+
+        .active { 
+            box-shadow: 0 0 15px white;
+            transform: scale(1.05);
+            outline: 2px solid white;
+        }
+
+        #display-mantra {
+            font-size: 2rem;
+            font-weight: 900;
+            min-height: 120px;
+            margin: 20px 0;
+            color: #fff200;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            text-transform: uppercase;
+            line-height: 1.2;
+        }
+
+        #timer {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-color);
+        }
+
+        .hidden { display: none; }
+
+        #start-btn {
+            width: 100%;
+            padding: 15px;
+            border-radius: 10px;
+            border: none;
+            background: var(--accent-color);
+            color: white;
+            font-weight: bold;
+            font-size: 1.1rem;
+            cursor: pointer;
+            box-shadow: 0 5px 15px rgba(255, 62, 62, 0.4);
+        }
+
+        #btn-cancelar {
+            background: transparent;
+            border: 1px solid #555;
+            color: #888;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        /* Estilo dos Botões de Pagamento InfinitePay */
+        .pagamento-footer {
+            margin-top: 30px;
+            padding-top: 10px;
+            border-top: 1px solid #333;
+        }
+        
+        .pagamento-footer p {
+            font-size: 0.8rem;
+            margin-bottom: 10px;
+        }
+
+        .container-pagamento {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 5px;
+            justify-content: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .btn-pay {
+            display: inline-block;
+            background-color: #00FF5F; /* Verde InfinitePay */
+            color: #000;
+            padding: 5px 10px;
+            font-size: 0.75rem;
+            font-weight: bold;
+            text-decoration: none;
+            border-radius: 6px;
+            transition: 0.2s;
+            min-width: 70px;
+        }
+
+        .btn-pay:hover {
+            filter: brightness(1.2);
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container" id="setup-screen">
+        <h1>DESABAFO EXPRESS 🤬</h1>
+        <p>Escreva o que te irritou:</p>
+        <textarea id="motivo" rows="3" placeholder="Aquele e-mail às 18h..."></textarea>
+        
+        <p>Nível de Ódio:</p>
+        <div class="termometro">
+            <button class="btn-nivel baixo" onclick="setNivel('baixo', 10, this)">Baixo (10s)</button>
+            <button class="btn-nivel medio" onclick="setNivel('medio', 20, this)">Médio (20s)</button>
+            <button class="btn-nivel alto" onclick="setNivel('alto', 30, this)">Alto (30s)</button>
+            <button class="btn-nivel aaaa" onclick="setNivel('AAAHHHH', 60, this)">AAAHHHH (1min)</button>
+        </div>
+
+        <button id="start-btn" onclick="iniciarSessao()">COMEÇAR TERAPIA</button>
+        <div class="pagamento-footer">
+            <p>Curtiu? Pague um café para o desenvolvedor:</p>
+            <div class="container-pagamento">
+                <a href="https://loja.infinitepay.io/matheusmaia_32/vup9848-doacao---desabafo-express-10" class="btn-pay" target="_blank">R$ 10</a>
+                <a href="https://loja.infinitepay.io/matheusmaia_32/duy4908-doacao---desabafo-express-50" class="btn-pay" target="_blank">R$ 50</a>
+                <a href="https://loja.infinitepay.io/matheusmaia_32/wik8868-doacao---desabafo-express-100" class="btn-pay" target="_blank">R$ 100</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="container hidden" id="timer-screen">
+        <h2 style="color: #888;">NÃO PARE DE REPETIR:</h2>
+        <div id="display-mantra"></div>
+        <div id="timer">00</div>
+        <button id="btn-cancelar" onclick="resetar()">Me acalmei (ou alguém chegou)</button>
+    </div>
+    <div id="ad-container" style="margin: 10px auto; width: 320px; display: flex; flex-direction: column; align-items: center;">
+        <p style="font-size: 0.6rem; opacity: 0.4; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 1px;">Publicidade</p>
+        <div id="ad-slot"></div>
+    </div>
+
+    <script>
+        // Função de Auto-Refresh para o Adsterra
+        function refreshAd() {
+            const adSlot = document.getElementById('ad-slot');
+            adSlot.innerHTML = ''; 
+            
+            const scriptConfig = document.createElement('script');
+            scriptConfig.type = 'text/javascript';
+            scriptConfig.text = `
+                atOptions = {
+                    'key' : 'f95477b41aad412b789767be6416723b',
+                    'format' : 'iframe',
+                    'height' : 50,
+                    'width' : 320,
+                    'params' : {}
+                };
+            `;
+            
+            const scriptInvoke = document.createElement('script');
+            scriptInvoke.type = 'text/javascript';
+            scriptInvoke.src = '//www.highperformanceformat.com/f95477b41aad412b789767be6416723b/invoke.js';
+            
+            adSlot.appendChild(scriptConfig);
+            adSlot.appendChild(scriptInvoke);
+        }
+
+        // Inicia o anúncio e define o ciclo de 30 segundos
+        refreshAd();
+        setInterval(refreshAd, 30000);
+    </script>
+
+    <script>
+        let tempoSelecionado = 0;
+        let countdown;
+        const frases = ["Vá pra puta que pariu!", "Vá tomar no cu!", "Vá se fuder!", "Vá se lascar!"];
+        const sintetizador = window.speechSynthesis;
+
+        function setNivel(nome, tempo, element) {
+            tempoSelecionado = tempo;
+            document.querySelectorAll('.btn-nivel').forEach(b => b.classList.remove('active'));
+            element.classList.add('active');
+        }
+
+        function falar(texto) {
+            // Cancela falas anteriores para não encavalar
+            sintetizador.cancel();
+            const fala = new SpeechSynthesisUtterance(texto);
+            fala.lang = 'pt-BR';
+            fala.rate = 1.2; // Velocidade um pouco mais rápida para parecer irritado
+            fala.pitch = 1;
+            sintetizador.speak(fala);
+        }
+
+        function iniciarSessao() {
+            if (tempoSelecionado === 0) {
+                alert("Selecione o quanto você está puto primeiro!");
+                return;
+            }
+
+            document.getElementById('setup-screen').classList.add('hidden');
+            document.getElementById('timer-screen').classList.remove('hidden');
+            
+            let tempoRestante = tempoSelecionado;
+            const displayTimer = document.getElementById('timer');
+            const displayMantra = document.getElementById('display-mantra');
+            
+            // Primeira frase e áudio
+            const fraseInicial = frases[Math.floor(Math.random() * frases.length)];
+            displayMantra.innerText = fraseInicial;
+            falar(fraseInicial);
+
+            countdown = setInterval(() => {
+                tempoRestante--;
+                displayTimer.innerText = tempoRestante < 10 ? `0${tempoRestante}` : tempoRestante;
+
+                // A cada 3 segundos, ele troca a frase e fala em áudio
+                if (tempoRestante > 0 && tempoRestante % 3 === 0) {
+                    const novaFrase = frases[Math.floor(Math.random() * frases.length)];
+                    displayMantra.innerText = novaFrase;
+                    falar(novaFrase);
+                }
+
+                if (tempoRestante <= 0) {
+                    clearInterval(countdown);
+                    falar("Pronto. Agora respira fundo e volta a trabalhar.");
+                    setTimeout(() => alert("Sessão finalizada. Aliviado?"), 500);
+                    resetar();
+                }
+            }, 1000);
+        }
+
+        function resetar() {
+            clearInterval(countdown);
+            sintetizador.cancel();
+            document.getElementById('timer-screen').classList.add('hidden');
+            document.getElementById('setup-screen').classList.remove('hidden');
+            document.getElementById('timer').innerText = "00";
+            document.getElementById('motivo').value = "";
+            tempoSelecionado = 0;
+            document.querySelectorAll('.btn-nivel').forEach(b => b.classList.remove('active'));
+        }
+    </script>
+</body>
+</html>
